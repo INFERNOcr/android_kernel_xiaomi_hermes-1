@@ -707,8 +707,8 @@ MODULE_DESCRIPTION(NIC_DESC);
 MODULE_SUPPORTED_DEVICE(NIC_NAME);
 MODULE_LICENSE("GPL");
 
-#define NIC_INF_NAME    "wlan%d" /* interface name */
-#if CFG_TC1_FEATURE
+#define NIC_INF_NAME    "wlan%d"	/* interface name */
+#if CFG_TC1_FEATURE || defined(CONFIG_MTK_COMBO_AOSP_TETHERING_SUPPORT)
 #define NIC_INF_NAME_IN_AP_MODE  "legacy%d"
 extern volatile int wlan_if_changed;
 #endif
@@ -2269,51 +2269,30 @@ wlanNetCreate(
 #if MTK_WCN_HIF_SDIO
     mtk_wcn_hif_sdio_get_dev(*((MTK_WCN_HIF_SDIO_CLTCTX *)pvData), &prDev);
 #else
-//    prDev = &((struct sdio_func *) pvData)->dev; //samp
-    prDev = pvData; //samp
+/* prDev = &((struct sdio_func *) pvData)->dev; //samp */
+	prDev = pvData;		/* samp */
 #endif
-    if (!prDev) {
-        printk(KERN_ALERT DRV_NAME "unable to get struct dev for wlan\n");
-    }
-    set_wiphy_dev(prWdev->wiphy, prDev);
+	if (!prDev)
+		DBGLOG(INIT, WARN, "unable to get struct dev for wlan\n");
+	/* don't set prDev as parent of wiphy->dev, because we have done device_add
+		in driver init. if we set parent here, parent will be not able to know this child,
+		and may occurs a KE in device_shutdown, to free wiphy->dev, because his parent
+		has been freed. */
+	/*set_wiphy_dev(prWdev->wiphy, prDev);*/
 
-    //4 <1.4> configure wireless_dev & wiphy
-    prWdev->iftype = NL80211_IFTYPE_STATION;
-    prWdev->wiphy->max_scan_ssids   = 1;    /* FIXME: for combo scan */
-    prWdev->wiphy->max_scan_ie_len = 512;
-    prWdev->wiphy->interface_modes  = BIT(NL80211_IFTYPE_STATION) | BIT(NL80211_IFTYPE_ADHOC);
-    prWdev->wiphy->bands[IEEE80211_BAND_2GHZ] = &mtk_band_2ghz;
-    //for the WPS probe request suband issue
-    //prWdev->wiphy->bands[IEEE80211_BAND_5GHZ] = &mtk_band_5ghz;
-    prWdev->wiphy->bands[IEEE80211_BAND_5GHZ] = NULL;
-    prWdev->wiphy->signal_type      = CFG80211_SIGNAL_TYPE_MBM;
-    prWdev->wiphy->cipher_suites    = (const u32 *)mtk_cipher_suites;
-    prWdev->wiphy->n_cipher_suites  = ARRAY_SIZE(mtk_cipher_suites);
-    prWdev->wiphy->flags            = WIPHY_FLAG_CUSTOM_REGULATORY | WIPHY_FLAG_SUPPORTS_FW_ROAM | WIPHY_FLAG_HAS_REMAIN_ON_CHANNEL;
-#if (CFG_SUPPORT_TDLS == 1)
-	TDLSEX_WIPHY_FLAGS_INIT(prWdev->wiphy->flags);
-#endif /* CFG_SUPPORT_TDLS */
-    prWdev->wiphy->max_remain_on_channel_duration = 5000;
-    prWdev->wiphy->mgmt_stypes = mtk_cfg80211_ais_default_mgmt_stypes;
-#ifdef CONFIG_PM
-    kalMemCopy(&prWdev->wiphy->wowlan, &wlan_wowlan_support,
-        sizeof(struct wiphy_wowlan_support));
-#endif
-    //4 <2> Create Glue structure
-    prGlueInfo = (P_GLUE_INFO_T) wiphy_priv(prWdev->wiphy);
-    if (!prGlueInfo) {
-        DBGLOG(INIT, ERROR, ("Allocating memory to glue layer failed\n"));
-        goto netcreate_err;
-    }
-
-    //4 <3> Initial Glue structure
-    //4 <3.1> Create net device
-#if CFG_TC1_FEATURE
-    if (wlan_if_changed) {
-        prGlueInfo->prDevHandler = alloc_netdev_mq(sizeof(P_GLUE_INFO_T), NIC_INF_NAME_IN_AP_MODE, ether_setup, CFG_MAX_TXQ_NUM);
-    } else {
-        prGlueInfo->prDevHandler = alloc_netdev_mq(sizeof(P_GLUE_INFO_T), NIC_INF_NAME, ether_setup, CFG_MAX_TXQ_NUM);
-    }
+#if !CFG_SUPPORT_PERSIST_NETDEV
+	/* 4 <3> Initial Glue structure */
+	prGlueInfo = (P_GLUE_INFO_T) wiphy_priv(prWdev->wiphy);
+	kalMemZero(prGlueInfo, sizeof(GLUE_INFO_T));
+	/* 4 <3.1> Create net device */
+#if CFG_TC1_FEATURE || defined(CONFIG_MTK_COMBO_AOSP_TETHERING_SUPPORT)
+	if (wlan_if_changed) {
+		prGlueInfo->prDevHandler =
+		    alloc_netdev_mq(sizeof(P_GLUE_INFO_T), NIC_INF_NAME_IN_AP_MODE, ether_setup, CFG_MAX_TXQ_NUM);
+	} else {
+		prGlueInfo->prDevHandler =
+		    alloc_netdev_mq(sizeof(P_GLUE_INFO_T), NIC_INF_NAME, ether_setup, CFG_MAX_TXQ_NUM);
+	}
 #else
     prGlueInfo->prDevHandler = alloc_netdev_mq(sizeof(P_GLUE_INFO_T), NIC_INF_NAME, ether_setup, CFG_MAX_TXQ_NUM);
 #endif

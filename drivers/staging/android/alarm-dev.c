@@ -26,6 +26,7 @@
 #include <linux/sched.h>
 #include <linux/spinlock.h>
 #include <linux/uaccess.h>
+//#include <linux/rtc.h> 
 #include <linux/alarmtimer.h>
 #include "android_alarm.h"
 #include <linux/xlog.h>
@@ -131,8 +132,8 @@ static void alarm_set(enum android_alarm_type alarm_type,
 	uint32_t alarm_type_mask = 1U << alarm_type;
 	unsigned long flags;
 
-	alarm_dbg(INFO, "alarm %d set %ld.%09ld\n",
-			alarm_type, ts->tv_sec, ts->tv_nsec);
+        alarm_dbg(INFO, "alarm %d set %ld.%09ld\n",
+                        alarm_type, ts->tv_sec, ts->tv_nsec);
 	if (alarm_type == ANDROID_ALARM_POWER_ON) {
 		alarm_set_power_on(*ts, false);
 		return;
@@ -241,10 +242,10 @@ static long alarm_do_ioctl(struct file *file, unsigned int cmd,
 		alarm_type != ANDROID_ALARM_POWER_ON_LOGO) {
 		return -EINVAL;
 	}
-	
-	if (ANDROID_ALARM_BASE_CMD(cmd) != ANDROID_ALARM_GET_TIME(0) 
-		&& ANDROID_ALARM_BASE_CMD(cmd)!= ANDROID_ALARM_SET_IPO(0)
-				&& ANDROID_ALARM_BASE_CMD(cmd) != ANDROID_ALARM_GET_POWER_ON_IPO) {
+
+        if (ANDROID_ALARM_BASE_CMD(cmd) != ANDROID_ALARM_GET_TIME(0)
+                && ANDROID_ALARM_BASE_CMD(cmd)!= ANDROID_ALARM_SET_IPO(0)
+                                && ANDROID_ALARM_BASE_CMD(cmd) != ANDROID_ALARM_GET_POWER_ON_IPO) {
 		if ((file->f_flags & O_ACCMODE) == O_RDONLY)
 			return -EPERM;
 		if (file->private_data == NULL &&
@@ -252,11 +253,14 @@ static long alarm_do_ioctl(struct file *file, unsigned int cmd,
 			spin_lock_irqsave(&alarm_slock, flags);
 			if (alarm_opened) {
 				spin_unlock_irqrestore(&alarm_slock, flags);
+				//alarm_dbg(INFO, "alarm_do_ioctl EBUSY\n");
+				//file->private_data = NULL;
 				return -EBUSY;
 			}
 			alarm_opened = 1;
 			file->private_data = (void *)1;
 			spin_unlock_irqrestore(&alarm_slock, flags);
+			//alarm_dbg(INFO, "alarm_do_ioctl opened\n");
 		}
 	}
 

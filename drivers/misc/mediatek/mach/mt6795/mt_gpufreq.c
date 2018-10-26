@@ -270,7 +270,7 @@ static void _mt_gpufreq_aee_init(void)
 ***************************/
 static int g_gpufreq_dvfs_disable_count = 0;
 
-static unsigned int g_cur_gpu_freq = 455000;
+static unsigned int g_cur_gpu_freq = GPU_DVFS_FREQ4;
 static unsigned int g_cur_gpu_volt = 100000;
 static unsigned int g_cur_gpu_idx = 0xFF;
 static unsigned int g_cur_gpu_OPPidx = 0xFF;
@@ -399,8 +399,8 @@ EXPORT_SYMBOL(mt_gpufreq_start_low_batt_volume_timer);
 * Check GPU DVFS Efuse
 **************************************************************************************/
 #ifdef CONFIG_ARM64
-#define GPU_DEFAULT_MAX_FREQ_MHZ    550
-#define GPU_DEFAULT_TYPE    0
+#define GPU_DEFAULT_MAX_FREQ_MHZ    689
+#define GPU_DEFAULT_TYPE    2
 #else
 #define GPU_DEFAULT_MAX_FREQ_MHZ    450
 #define GPU_DEFAULT_TYPE    2
@@ -623,9 +623,9 @@ static struct input_handler mt_gpufreq_input_handler = {
 
 static void mt_gpufreq_power_calculation(unsigned int oppidx, unsigned int temp)
 {
-#define GPU_ACT_REF_POWER	530	/* mW  */
-#define GPU_ACT_REF_FREQ	455000 /* KHz */
-#define GPU_ACT_REF_VOLT	100000	/* mV x 100 */
+#define GPU_ACT_REF_POWER	530	
+#define GPU_ACT_REF_FREQ	GPU_DVFS_FREQ4 
+#define GPU_ACT_REF_VOLT	100000	
 
 	unsigned int p_total = 0, p_dynamic = 0, p_leakage = 0, ref_freq = 0, ref_volt = 0;
 

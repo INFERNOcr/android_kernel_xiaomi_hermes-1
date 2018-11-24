@@ -1,5 +1,5 @@
 # Custom kernel for Xiaomi Redmi Note 2 (Hermes)
-# Kernel version 3.10.61
+# Kernel version 3.10.108 (upstreamed from me)
 # Rebased Kernel (Credits: @Dinolek)
 
 * Works:

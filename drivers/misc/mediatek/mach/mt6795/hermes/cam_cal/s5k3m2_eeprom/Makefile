@@ -1,4 +1,4 @@
 include $(srctree)/drivers/misc/mediatek/Makefile.custom
+obj-y += s5k3m2_eeprom.o
 
-obj-y	:=  stk3x1x.o stk_cust_alsps.o
 

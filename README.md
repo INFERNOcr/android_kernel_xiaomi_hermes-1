@@ -71,6 +71,12 @@ make -C kernel-3.10 O=$TOP/KERNEL_OBJ ROOTDIR=$TOP <br>
 * I2C4
 	* CW2015 		(0062)
 
+# TODO
+* upstream kernel - DONE
+* add wireguard support
+* add d2tw
+* help @Dinolek who's the main author of the kernel
+
 # AUTORS
 * nofearnohappy
 * LazyC0DEr

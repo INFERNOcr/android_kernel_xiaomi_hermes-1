@@ -20,10 +20,6 @@ void wdt_dump_reg(void);
 /* 0x20000000 for 75 irq or reboot mode */
 int mtk_wdt_swsysret_config(int bit, int set_value);
 
-#ifdef	CONFIG_HAVE_DDR_RESERVE_MODE
-int mtk_rgu_dram_reserved(int enable);
-#endif
-
 /* end */
 
 #endif

@@ -59,12 +59,6 @@ config CPU_FREQ_DEFAULT_GOV_DARKNESS
 	select CPU_FREQ_GOV_DARKNESS
 	help
 
-config CPU_FREQ_DEFAULT_GOV_SMARTMAX
-	bool "smartmax"
-	select CPU_FREQ_GOV_SMARTMAX
-	help
-	  Use the CPUFreq governor 'smartmax' as default
-
 config CPU_FREQ_DEFAULT_GOV_PERFORMANCE
 	bool "performance"
 	select CPU_FREQ_GOV_PERFORMANCE
@@ -239,12 +233,6 @@ config CPU_FREQ_GOV_ONDEMAND
 	  For details, take a look at linux/Documentation/cpu-freq.
 
 	  If in doubt, say N.
-
-config CPU_FREQ_GOV_SMARTMAX
-        tristate "'smartmax' cpufreq policy governor"
-        select CPU_FREQ_TABLE
-        help
-'smartmax' combined ondemand and smartass2
 
 config CPU_FREQ_GOV_INTERACTIVEPLUS
         tristate "'interactiveplus' cpufreq policy governor"

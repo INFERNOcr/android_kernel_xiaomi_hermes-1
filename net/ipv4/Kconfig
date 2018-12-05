@@ -433,19 +433,6 @@ config INET_UDP_DIAG
 	  Support for UDP socket monitoring interface used by the ss tool.
 	  If unsure, say Y.
 
-menuconfig TCP_CONG_ADVANCED
-	bool "TCP: advanced congestion control"
-	---help---
-	  Support for selection of various TCP congestion control
-	  modules.
-
-	  Nearly all users can safely say no here, and a safe default
-	  selection will be made (CUBIC with new Reno as a fallback).
-
-	  If unsure, say N.
-
-if TCP_CONG_ADVANCED
-
 config TCP_CONG_BIC
 	tristate "Binary Increase Congestion (BIC) control"
 	default m
@@ -610,11 +597,8 @@ choice
 
 endchoice
 
-endif
-
 config TCP_CONG_CUBIC
 	tristate
-	depends on !TCP_CONG_ADVANCED
 	default y
 
 config DEFAULT_TCP_CONG

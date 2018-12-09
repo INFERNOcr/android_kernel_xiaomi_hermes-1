@@ -10,4 +10,3 @@ config CUSTOM_KERNEL_MAGNETOMETER
 	  data
 
 source "drivers/misc/mediatek/magnetometer/akm09911-new/Kconfig"
-source "drivers/misc/mediatek/magnetometer/yamaha537/Kconfig"

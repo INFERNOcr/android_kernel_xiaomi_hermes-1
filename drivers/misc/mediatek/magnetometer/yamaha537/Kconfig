@@ -1,3 +1,0 @@
-config MTK_YAS537
-	bool "YAS537 for MediaTek package"
-	default n
